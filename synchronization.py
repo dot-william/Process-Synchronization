@@ -1,64 +1,27 @@
-from telnetlib import STATUS
 import threading
 from threading import Thread, Semaphore
 import time
 import random
 
-<<<<<<< HEAD
 # global empty, full, and mutex semaphores
-=======
-# Global Variable
-fittingRoom 
-currentColor = "None"
->>>>>>> fe7a84a241b117041194f7d21d0511853ae4c16d
 empty = Semaphore()
 full = Semaphore()
 mutex = Semaphore()
+# global color variable
+color = 'b'
+# global decline variable
+decline = False
+# total processes count
+total = 0
 
-class ColoredThread(Thread):
-    def __init__(self, target, color):
-        Thread.__init__(self, target=self.executeThread)
-        self.color = color
-        self.id = -1
-
-    def setID(self, id):
-        self.id = id
-
-    def printSelf(self):
-        print(f"Thread ID: {self.id}\nColor = {self.color}")
-    
-    def executeThread(self):
-        global currentColor
-        global fittingRoom
-        status = fittingRoom.acquire()
-
-        # If not full and currently no Color executing
-        if  status and currentColor == "None":
-            currentColor = self.color
-            self.printSelf()
-            time.sleep(1)
-            fittingRoom.release()
-            
-        elif status and currentColor == self.color:
-            self.printSelf()
-            time.sleep(1)
-            fittingRoom.release()
-
-class FittingRoom():
-    color = 'e' # can be 'b', 'g', or 'e'
-
-def run():
-    time.sleep(1)
-    print("")
-    print("done")
-
-
+# get input from user
 def askInput():
     numSlots = input("Enter the number of slots inside the fitting room: ")
     numBlueThreads = input("Enter the number of blue threads: ")
     numGreenThreads = input("Enter the number of green threads: ")
     return numSlots, numBlueThreads, numGreenThreads
 
+# create threads of the specified count and color and
 def createThreads(queue, numThreads, color):
     for _ in range(numThreads):
         t = ColoredThread(target=run, color=color)
@@ -71,10 +34,6 @@ def printQueue(queue):
 
 class ColoredThread(Thread):
     global empty, full, mutex
-    def run():
-        time.sleep(1)
-        print("")
-        print("done")
 
     def __init__(self, target, color):
         Thread.__init__(self, target=run)
@@ -87,8 +46,16 @@ class ColoredThread(Thread):
     def printSelf(self):
         print(f"color = {self.color}, ID = {self.id}")
 
+    def run(self):
+        time.sleep(1)
+        print("")
+        printSelf(self)
+
+
+
+
+
 def main():
-    global fittingRoom 
     #Ask user input
     # inputs = askInput()
     inputs = (2, 3, 4)
@@ -96,12 +63,43 @@ def main():
     numBlue = int(inputs[1])
     numGreen = int(inputs[2])
 
-    # create semaphores
+    # initialize semaphores
     empty = Semaphore(numSlots)
     full = Semaphore(0)
-    mutex = Semaphore()
+    # mutex = Semaphore()
 
-    # Create thread
+
+'''
+empty semaphore is a sign that there is still a vacant slot in the fitting room.
+full semaphore is a sign that there is still at least one thread in the fitting room.
+mutex ensures that only one thread can enter or leave the fitting room at a time.
+color is global variable which is the color of the fitting room.
+decline is boolean variable if the fitting room is full and processes should leave
+until the fitting room is empty. It it False until empty is False, then becomes True
+until full is False.
+
+Fitting room is empty
+set decline to False
+Process wants to start
+empty.acquire()
+mutex.acquire()
+# start process
+mutex.release()
+full.release()
+
+Once fitting room is full,
+set decline to True
+Process has completed
+empty.acquire()
+mutex.acquire()
+# print process
+mutex.release()
+full.release()
+
+Once fitting room is empty, switch colors
+switch color
+'''
+    # Create green and blue threads
     queue = []
     createThreads(queue, numBlue, 'b')
     createThreads(queue, numGreen, 'g')
@@ -111,7 +109,7 @@ def main():
     # Shuffle the elements
     random.shuffle(queue)
 
-    printQueue(queue)
+    # printQueue(queue) count and color and
 
     # assign thread IDs
     id=1
@@ -120,31 +118,11 @@ def main():
         id += 1
 
     printQueue(queue)
-    
-    fittingRoom = Semaphore(numSlots)
 
-    readyQueue = []
-    # Pop the threads, if statement so taht there wont be a mix of blue and green, to the waiting Queue
-    
-        
-        
-    #execute readyQueue
+    global total = numBlue + numGreen
+    while (total > 0):
 
-
-    # Threads not able to get into fitting room waits for an available room to open
-
-    # when room is empty, process gets into the room
-
-    # There is n number of threads waiting
-
-    # So there will be a certain
-
-
-
-    # 1 room == 1 binary semaphore
-    # all initialized to 1
-
-
+        # total -= 1
 
 if __name__ == "__main__":
     main()
