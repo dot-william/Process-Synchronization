@@ -3,6 +3,7 @@ from threading import Thread, Semaphore
 import time
 import random
 
+# global empty, full, and mutex semaphores
 empty = Semaphore()
 full = Semaphore()
 mutex = Semaphore()
