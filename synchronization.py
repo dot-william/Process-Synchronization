@@ -1,11 +1,16 @@
+from telnetlib import STATUS
 import threading
 from threading import Thread, Semaphore
 import time
 import random
 
+# Global Variable
+fittingRoom 
+currentColor = "None"
+
 class ColoredThread(Thread):
     def __init__(self, target, color):
-        Thread.__init__(self, target=target)
+        Thread.__init__(self, target=self.executeThread)
         self.color = color
         self.id = -1
 
@@ -13,7 +18,25 @@ class ColoredThread(Thread):
         self.id = id
 
     def printSelf(self):
-        print(f"color = {self.color}, ID = {self.id}")
+        print(f"Thread ID: {self.id}\nColor = {self.color}")
+    
+    def executeThread(self):
+        global currentColor
+        global fittingRoom
+        status = fittingRoom.acquire()
+
+        # If not full and currently no Color executing
+        if  status and currentColor == "None":
+            currentColor = self.color
+            self.printSelf()
+            time.sleep(1)
+            fittingRoom.release()
+            
+        elif status and currentColor == self.color:
+            self.printSelf()
+            time.sleep(1)
+            fittingRoom.release()
+
 
 class FittingRoom():
     color = 'e' # can be 'b', 'g', or 'e'
@@ -34,15 +57,13 @@ def createThreads(queue, numThreads, color):
         t = ColoredThread(target=run, color=color)
         queue.append(t)
 
-def signal():
-    pass
-
 def printQueue(queue):
     for t in queue:
         t.printSelf()
     print()
 
 def main():
+    global fittingRoom 
     #Ask user input
     # inputs = askInput()
     inputs = (2, 3, 4)
@@ -69,10 +90,16 @@ def main():
         id += 1
 
     printQueue(queue)
+    
+    fittingRoom = Semaphore(numSlots)
 
+    readyQueue = []
     # Pop the threads, if statement so taht there wont be a mix of blue and green, to the waiting Queue
+    
+        
+        
+    #execute readyQueue
 
-    # Can't execute
 
     # Threads not able to get into fitting room waits for an available room to open
 
