@@ -33,7 +33,7 @@ def printQueue(queue):
     print()
 
 class ColoredThread(Thread):
-    global empty, full, mutex
+    global empty, full, mutex, color, decline, total
 
     def __init__(self, target, color):
         Thread.__init__(self, target=run)
@@ -47,10 +47,26 @@ class ColoredThread(Thread):
         print(f"color = {self.color}, ID = {self.id}")
 
     def run(self):
-        time.sleep(1)
-        print("")
-        printSelf(self)
+        # check if fitting room is empty
+        fullStatus = full.acquire(blocking=False)
+        mutex.acquire()
+        # if fitting room is empty, set decline to False
+        if (not fullStatus):
+            decline = False()
+        else
+            full.release
 
+        # mutex.acquire()
+        # If not full and currently no Color executing
+        if status and (color == "None" or color == self.color) and decline == False:
+            # if (color == "None"):
+            #     print(f"{self.color} only")
+            time.sleep(1)
+            print("")
+            total -= 1
+            printSelf(self)
+            mutex.release()
+            full.release()
 
 
 
@@ -66,7 +82,7 @@ def main():
     # initialize semaphores
     empty = Semaphore(numSlots)
     full = Semaphore(0)
-    # mutex = Semaphore()
+    mutex = Semaphore()
 
 
 '''
@@ -101,15 +117,13 @@ switch color
 '''
     # Create green and blue threads
     queue = []
-    createThreads(queue, numBlue, 'b')
-    createThreads(queue, numGreen, 'g')
+    createThreads(queue, numBlue, 'Blue')
+    createThreads(queue, numGreen, 'Green')
 
     printQueue(queue)
 
     # Shuffle the elements
     random.shuffle(queue)
-
-    # printQueue(queue) count and color and
 
     # assign thread IDs
     id=1
@@ -120,8 +134,7 @@ switch color
     printQueue(queue)
 
     global total = numBlue + numGreen
-    while (total > 0):
-
+    # while (total > 0):
         # total -= 1
 
 if __name__ == "__main__":
