@@ -1,7 +1,22 @@
 import threading
+from threading import Thread, Semaphore
 import time
 import random
 
+class ColoredThread(Thread):
+    def __init__(self, target, color):
+        Thread.__init__(self, target=target)
+        self.color = color
+        self.id = -1
+
+    def setID(self, id):
+        self.id = id
+
+    def printSelf(self):
+        print(f"color = {self.color}, ID = {self.id}")
+
+class FittingRoom():
+    color = 'e' # can be 'b', 'g', or 'e'
 
 def run():
     time.sleep(1)
@@ -14,28 +29,46 @@ def askInput():
     numGreenThreads = input("Enter the number of green threads: ")
     return numSlots, numBlueThreads, numGreenThreads
 
-def createThread(queue, numThreads):
+def createThreads(queue, numThreads, color):
     for _ in range(numThreads):
-        t = threading.Thread()
+        t = ColoredThread(target=run, color=color)
         queue.append(t)
 
 def signal():
     pass
 
+def printQueue(queue):
+    for t in queue:
+        t.printSelf()
+    print()
+
 def main():
     #Ask user input
-    inputs = askInput()
-    numSlots = input(0)
-    numBlue = input(1)
-    numGreen = input(2)
+    # inputs = askInput()
+    inputs = (2, 3, 4)
+    numSlots = int(inputs[0])
+    numBlue = int(inputs[1])
+    numGreen = int(inputs[2])
 
     # Create thread
     queue = []
-    createThread(queue, numBlue)
-    createThread(queue, numGreen)
+    createThreads(queue, numBlue, 'b')
+    createThreads(queue, numGreen, 'g')
+
+    printQueue(queue)
 
     # Shuffle the elements
     random.shuffle(queue)
+
+    printQueue(queue)
+
+    # assign thread IDs
+    id=1
+    for t in queue:
+        t.setID(id)
+        id += 1
+
+    printQueue(queue)
 
     # Pop the threads, if statement so taht there wont be a mix of blue and green, to the waiting Queue
 
@@ -45,16 +78,16 @@ def main():
 
     # when room is empty, process gets into the room
 
-    # There is n number of threads waiting 
+    # There is n number of threads waiting
 
-    # So there will be a certain 
+    # So there will be a certain
 
 
 
     # 1 room == 1 binary semaphore
     # all initialized to 1
-    
-    
+
+
 
 if __name__ == "__main__":
     main()
