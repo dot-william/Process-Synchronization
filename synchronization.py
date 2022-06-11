@@ -7,6 +7,9 @@ import random
 # Global Variable
 fittingRoom 
 currentColor = "None"
+empty = Semaphore()
+full = Semaphore()
+mutex = Semaphore()
 
 class ColoredThread(Thread):
     def __init__(self, target, color):
@@ -37,7 +40,6 @@ class ColoredThread(Thread):
             time.sleep(1)
             fittingRoom.release()
 
-
 class FittingRoom():
     color = 'e' # can be 'b', 'g', or 'e'
 
@@ -45,6 +47,7 @@ def run():
     time.sleep(1)
     print("")
     print("done")
+
 
 def askInput():
     numSlots = input("Enter the number of slots inside the fitting room: ")
@@ -62,6 +65,24 @@ def printQueue(queue):
         t.printSelf()
     print()
 
+class ColoredThread(Thread):
+    global empty, full, mutex
+    def run():
+        time.sleep(1)
+        print("")
+        print("done")
+
+    def __init__(self, target, color):
+        Thread.__init__(self, target=run)
+        self.color = color
+        self.id = -1
+
+    def setID(self, id):
+        self.id = id
+
+    def printSelf(self):
+        print(f"color = {self.color}, ID = {self.id}")
+
 def main():
     global fittingRoom 
     #Ask user input
@@ -70,6 +91,11 @@ def main():
     numSlots = int(inputs[0])
     numBlue = int(inputs[1])
     numGreen = int(inputs[2])
+
+    # create semaphores
+    empty = Semaphore(numSlots)
+    full = Semaphore(0)
+    mutex = Semaphore()
 
     # Create thread
     queue = []
