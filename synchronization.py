@@ -1,12 +1,57 @@
+from telnetlib import STATUS
 import threading
 from threading import Thread, Semaphore
 import time
 import random
 
+<<<<<<< HEAD
 # global empty, full, and mutex semaphores
+=======
+# Global Variable
+fittingRoom 
+currentColor = "None"
+>>>>>>> fe7a84a241b117041194f7d21d0511853ae4c16d
 empty = Semaphore()
 full = Semaphore()
 mutex = Semaphore()
+
+class ColoredThread(Thread):
+    def __init__(self, target, color):
+        Thread.__init__(self, target=self.executeThread)
+        self.color = color
+        self.id = -1
+
+    def setID(self, id):
+        self.id = id
+
+    def printSelf(self):
+        print(f"Thread ID: {self.id}\nColor = {self.color}")
+    
+    def executeThread(self):
+        global currentColor
+        global fittingRoom
+        status = fittingRoom.acquire()
+
+        # If not full and currently no Color executing
+        if  status and currentColor == "None":
+            currentColor = self.color
+            self.printSelf()
+            time.sleep(1)
+            fittingRoom.release()
+            
+        elif status and currentColor == self.color:
+            self.printSelf()
+            time.sleep(1)
+            fittingRoom.release()
+
+class FittingRoom():
+    color = 'e' # can be 'b', 'g', or 'e'
+
+def run():
+    time.sleep(1)
+    print("")
+    print("done")
+
 
 def askInput():
     numSlots = input("Enter the number of slots inside the fitting room: ")
@@ -18,9 +63,6 @@ def createThreads(queue, numThreads, color):
     for _ in range(numThreads):
         t = ColoredThread(target=run, color=color)
         queue.append(t)
-
-def signal():
-    pass
 
 def printQueue(queue):
     for t in queue:
@@ -46,6 +88,7 @@ class ColoredThread(Thread):
         print(f"color = {self.color}, ID = {self.id}")
 
 def main():
+    global fittingRoom 
     #Ask user input
     # inputs = askInput()
     inputs = (2, 3, 4)
@@ -77,10 +120,16 @@ def main():
         id += 1
 
     printQueue(queue)
+    
+    fittingRoom = Semaphore(numSlots)
 
+    readyQueue = []
     # Pop the threads, if statement so taht there wont be a mix of blue and green, to the waiting Queue
+    
+        
+        
+    #execute readyQueue
 
-    # Can't execute
 
     # Threads not able to get into fitting room waits for an available room to open
 
