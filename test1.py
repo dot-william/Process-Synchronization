@@ -14,7 +14,10 @@ mutex ensures that only one thread can enter or leave the fitting room at a time
 fittingRoom = Semaphore()
 mutex = Semaphore()
 # global color variable
-gcolor = 'Blue'
+gcolor = 'Green'
+numSlots = 0
+runningThreads = 0
+finishedThreads = 0
 
 # get input from user
 def askInput():
@@ -35,19 +38,23 @@ def printQueue(queue):
     print()
 
 class ColoredThread(Thread):
-    global fittingRoom, mutex, gcolor
 
     def run(self):
+        global fittingRoom, mutex, gcolor, numSlots, runningThreads, finishedThreads
+        while(self.color != gcolor):
+            pass
         if (self.color == gcolor):
             fittingRoom.acquire()
+            if (runningThreads == 0):
+                print(f"{self.color} only")
+            runningThreads += 1
             mutex.acquire()
             print("Running")
             time.sleep(1)
             # print thread
             self.printSelf()
-            # fittingRoom.release()
             mutex.release()
-            # fittingRoom.release()
+            finishedThreads += 1;
 
 
     def __init__(self, color):
@@ -62,13 +69,14 @@ class ColoredThread(Thread):
         print(f"color = {self.color}, ID = {self.id}")
 
 def main():
-    global fittingRoom, mutex, gcolor
+    global fittingRoom, mutex, gcolor, numSlots, runningThreads, finishedThreads
     #Ask user input
     # inputs = askInput()
     inputs = (2, 3, 4)
     numSlots = int(inputs[0])
     numBlue = int(inputs[1])
     numGreen = int(inputs[2])
+    runningThreads = 0
 
     # initialize semaphores
     fittingRoom = Semaphore(numSlots)
@@ -95,17 +103,20 @@ def main():
     for t in queue:
         t.start()
 
-    # while (True):
-    #     if ():
-    #         mutex.acquire()
-    #         for i in range(numSlots):
-    #             fittingRoom.release()
-    #         if gcolor == 'Blue':
-    #             gcolor = 'Green';
-    #         else:
-    #             gcolor = 'Blue';
-    #         print('Fitting room empty')
-    #         mutex.release()
+    while (True):
+        if (runningThreads > 0 and runningThreads == finishedThreads):
+            print(runningThreads)
+            finishedThreads = 0
+            mutex.acquire()
+            while (runningThreads > 0):
+                fittingRoom.release()
+                runningThreads -= 1
+            if gcolor == 'Blue':
+                gcolor = 'Green';
+            else:
+                gcolor = 'Blue';
+            print('Fitting room empty')
+            mutex.release()
 
 if __name__ == "__main__":
     main()
