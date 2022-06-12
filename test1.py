@@ -41,20 +41,21 @@ class ColoredThread(Thread):
 
     def run(self):
         global fittingRoom, mutex, gcolor, numSlots, runningThreads, finishedThreads
-        while(self.color != gcolor):
-            pass
-        if (self.color == gcolor):
+        fittingRoom.acquire()
+        while (self.color != gcolor):
+            fittingRoom.release()
             fittingRoom.acquire()
-            if (runningThreads == 0):
-                print(f"{self.color} only")
-            runningThreads += 1
-            mutex.acquire()
-            print("Running")
-            time.sleep(1)
-            # print thread
-            self.printSelf()
-            mutex.release()
-            finishedThreads += 1;
+
+        if (runningThreads == 0):
+            print(f"{self.color} only")
+        runningThreads += 1
+        mutex.acquire()
+        print("Running")
+        time.sleep(0.1)
+        # print thread
+        self.printSelf()
+        mutex.release()
+        finishedThreads += 1;
 
 
     def __init__(self, color):
@@ -72,7 +73,9 @@ def main():
     global fittingRoom, mutex, gcolor, numSlots, runningThreads, finishedThreads
     #Ask user input
     # inputs = askInput()
-    inputs = (2, 3, 4)
+    # inputs = (2, 3, 4)
+    # inputs = (2, 4, 4)
+    inputs = (4, 5, 10)
     numSlots = int(inputs[0])
     numBlue = int(inputs[1])
     numGreen = int(inputs[2])
@@ -103,9 +106,11 @@ def main():
     for t in queue:
         t.start()
 
-    while (True):
+    total = numGreen + numBlue
+
+    while (total > 0):
         if (runningThreads > 0 and runningThreads == finishedThreads):
-            print(runningThreads)
+            total -= runningThreads
             finishedThreads = 0
             mutex.acquire()
             while (runningThreads > 0):
