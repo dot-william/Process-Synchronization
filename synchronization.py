@@ -47,16 +47,19 @@ class ColoredThread(Thread):
         print(f"color = {self.color}, ID = {self.id}")
 
     def run(self):
-        # check if fitting room is empty
-        fullStatus = full.acquire(blocking=False)
-        mutex.acquire()
-        # if fitting room is empty, set decline to False
-        if (not fullStatus):
-            decline = False()
-        else
-            full.release
-
         # mutex.acquire()
+        while (total > 0):
+            # check if fitting room is empty
+            fullStatus = full.acquire(blocking=False)
+            mutex.acquire()
+            # if fitting room is empty, set decline to False
+            if (not fullStatus):
+                decline = False()
+            else
+                full.release
+
+        emptyStatus = empty.acquire()
+        mutex.acquire()
         # If not full and currently no Color executing
         if status and (color == "None" or color == self.color) and decline == False:
             # if (color == "None"):
@@ -134,8 +137,7 @@ switch color
     printQueue(queue)
 
     global total = numBlue + numGreen
-    # while (total > 0):
-        # total -= 1
+
 
 if __name__ == "__main__":
     main()
