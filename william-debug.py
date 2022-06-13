@@ -162,8 +162,8 @@ def executeThread(color, id):
     notFinished = True
     while(notFinished):        
         # The first thread to enter room after color switch
-        if (counter == 0 and currNumInRoom == 0) and color == currentColor:
-            print(f"T{id} is trying to access from first if statement! @ [currNum = {currNumInRoom}] @ {timeUnit}s\n", end="")
+        if ((counter == 0 and currNumInRoom == 0) and color == currentColor) or findCurrentColorTotal(currentColor) == 0:
+            print(f"T{id} is trying to access from first if statement! @ [currNum = {currNumInRoom}] @ {counter}\n", end="")
             fittingRoom.acquire()
             counter += 1 # increase counter of thread that acquired resource
             print(f"\nIn while if\n", end="")
@@ -172,7 +172,7 @@ def executeThread(color, id):
             print(f"---- {currentColor} Only ----\n", end="")
             execute(id)
             fittingRoom.release()
-            print(f"T{id} is released. [currNum = {currNumInRoom}] @ {timeUnit}s\n", end="")
+            print(f"T{id} is released. [currNum = {currNumInRoom}]\n", end="")
             currNumInRoom -= 1
             notFinished = False # So thread can exit the loop
             # if counter reaches the half of the total process and no more process are in the room OR there are no more processes left, switch color
@@ -181,15 +181,15 @@ def executeThread(color, id):
         
         # The rest of threads - check current color if matched and if the counter of number executed threads hasn't reached the half
         elif currentColor == color and counter < currentColorTotal // 2:
-            print(f"T{id} is trying to access! @ [currNum = {currNumInRoom}] @ {timeUnit}s\n", end="")
+            print(f"T{id} is trying to access! @ [currNum = {currNumInRoom}] and counter: {counter}\n", end="")
             fittingRoom.acquire()
             counter += 1 # increase counter of thread that acquired resource
-            print(f"\nIn while elif\n", end="")
+            print(f"\nT{id} In while elif and counter: {counter}\n", end="")
             # print(f"Thread ID = {id}, color = {color}\n", end="")
             execute(id)
             fittingRoom.release()
             currNumInRoom-=1
-            print(f"T{id} is released. [currNum = {currNumInRoom}] @ {timeUnit}s\n", end="")
+            print(f"T{id} is released. [currNum = {currNumInRoom}]\n", end="")
             notFinished = False
             # if counter reaches the half of the total process and no more process are in the room OR there are no more processes left, switch color
             if ((counter >= currentColorTotal // 2) and currNumInRoom == 0) or (currentColorTotal // 2 == 0):

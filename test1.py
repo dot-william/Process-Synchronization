@@ -105,7 +105,7 @@ def main():
     createThreads(queue, numGreen, 'Green')
 
     # Shuffle the ColoredThreads in the queue
-    #random.shuffle(queue)
+    random.shuffle(queue)
 
     # assign ColoredThread IDs
     id=1
@@ -121,6 +121,7 @@ def main():
     while (total > 0):
         mutex.acquire()
         # if all the threads in the fitting room have finished executing
+        
         if (runningThreads > 0 and runningThreads == finishedThreads):
             # decrement the total thread count
             if gcolor == 'Blue':
