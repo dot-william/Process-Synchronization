@@ -59,7 +59,6 @@ class ColoredThread(Thread):
         mutex.release()
         finishedThreads += 1;
 
-
     def __init__(self, color):
         Thread.__init__(self, target=self.run)
         self.color = color
@@ -75,9 +74,9 @@ def main():
     global fittingRoom, mutex, gcolor, numSlots, runningThreads, finishedThreads, firstPrinted
     #Ask user input
     # inputs = askInput()
-    inputs = (2, 3, 4)
+    # inputs = (2, 3, 4)
     # inputs = (2, 4, 3)
-    # inputs = (3, 7, 7) # odd blues and odd greens
+    inputs = (3, 7, 7) # odd blues and odd greens
     # inputs = (4, 8, 10) # even blues and even greens
     # inputs = (5, 7, 6) # odd blues, even greens
     # inputs = (3, 12, 9) # even blues, odd greens
@@ -117,11 +116,12 @@ def main():
     total = numGreen + numBlue
 
     while (total > 0):
+        mutex.acquire()
         if (runningThreads > 0 and runningThreads == finishedThreads):
             total -= runningThreads
             finishedThreads = 0
-            mutex.acquire()
             # releases all occupied rooms in the fitting room
+            print('Fitting room empty\n')
             while (runningThreads > 0):
                 fittingRoom.release()
                 runningThreads -= 1
@@ -131,9 +131,7 @@ def main():
                 gcolor = 'Green'
             else:
                 gcolor = 'Blue'
-            print('Fitting room empty\n')
-
-            mutex.release()
+        mutex.release()
 
 if __name__ == "__main__":
     main()
