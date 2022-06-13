@@ -16,6 +16,7 @@ currentColorTotal = 0
 totalBlue = 0 
 totalGreen = 0
 counter = 0 # used to track if need to switch, increments whenever it goes in the section
+numAllowed = None
 
 # get input from user
 def askInput():
@@ -33,14 +34,9 @@ def createThreads(queue, numThreads, color):
         print(f"~~T{id} made")
         id+=1
         t.start()
+        time.sleep(1)
         queue.append(t)
-        #time.sleep(1)
         
-# def printSection(id, color):
-#     global currNumInRoom
-#     print(f"Thread ID = {id}, color = {color}")
-#     time.sleep(10)
-    
 def findCurrentColorTotal(color):
     global totalBlue, totalGreen
     if color == "Blue":
@@ -65,77 +61,144 @@ def alternateColor():
     else:
         currentColor = "Blue"
 
-def checkIfSwitchColor():
-    global currentColorTotal, currentColor, counter
-
+def switchColor():
+    global currentColorTotal, counter, counter
     currentColorTotal = findCurrentColorTotal(currentColor) # gets total threads of the current color
     
-    if currentColor != None and counter == currentColorTotal // 2:
+    if counter != 0 and counter == currentColorTotal // 2:
         numExecuted = counter
         setCurrentColorTotal(numExecuted)
-        currentColorTotal = findCurrentColorTotal(currentColor)
-        print(f"Switching colors count: {currentColor}\n", end="")
+        print(f"Switching colors!!! Count after execution: {currentColorTotal}\n", end="")
         alternateColor()
         print(f"After color change: {currentColor}\n", end="")
         counter = 0
 
+def execute(id):
+    global counter, currNumInRoom, currentColor
+
+    print(f"\nT{id} was granted access!\n", end="")
+    currNumInRoom += 1 # thread enters room
+    # print(f"Current {currentColor} total initialized: {currentColorTotal}\n", end="")
+    print(f"Thread ID = {id}, color = {currentColor}\n", end="")
+    time.sleep(10) # stays in the room for this amount of time
+    print(f"T{id} is about to release! [currNum = {currNumInRoom}] @ {timeUnit}s\n", end="")
+
+# def executeThread(color, id):
+#     global fittingRoom, currentColor, currNumInRoom, timeUnit, currentColorTotal
+#     global counter
+#     global enterRoom
+
+#     # If no color is assigned yet and no one is in the room - initialize
+#     if currentColor == None and currNumInRoom == 0:
+#         print(f"T{id} is trying to access from first if statement! @ [currNum = {currNumInRoom}] @ {timeUnit}s\n", end="")
+#         fittingRoom.acquire()
+#         print(f"\nT{id} was granted access!\n", end="")
+#         currentColor = color # assign Color
+#         currentColorTotal = findCurrentColorTotal(currentColor) # get current total of current color
+#         execute()
+#         fittingRoom.release()
+#         print(f"T{id} is released. [currNum = {currNumInRoom}] @ {timeUnit}s\n", end="")
+#         currNumInRoom -= 1
+
+#     # Check current color if matched and if the counter of number executed threads hasn't reached the half
+#     elif currentColor == color and counter < currentTotal // 2 :
+#         print(f"T{id} is trying to access! @ [currNum = {currNumInRoom}] @ {timeUnit}s\n", end="")
+#         fittingRoom.acquire()
+#         print(f"\nT{id} was granted access! @ [currNum = {currNumInRoom}] @ {timeUnit}s\n", end="")
+#         counter += 1 # increase counter of thread that acquired resource
+#         currNumInRoom += 1 # thread enters room
+        
+#         # print(f"Thread ID = {id}, color = {color}\n", end="")
+#         time.sleep(10)
+#         print(f"T{id} is about to release! [currNum = {currNumInRoom}] @ {timeUnit}s\n", end="")
+#         fittingRoom.release()
+#         currNumInRoom-=1
+#         print(f"T{id} is released. [currNum = {currNumInRoom}] @ {timeUnit}s\n", end="")
+
+#     # if counter reached the half of the current total
+#     elif counter >=    // 2:
+#         enterRoom = False
+
+#     # If only one process is left
+#     elif currentColor == color and currentTotal == 1:
+#         print(f"T{id} is trying to access! @ [currNum = {currNumInRoom}] @ {timeUnit}s\n", end="")
+#         fittingRoom.acquire()
+#         currNumInRoom += 1
+#         print(f"\nT{id} was granted access! @ [currNum = {currNumInRoom}] @ {timeUnit}s\n", end="")
+#         time.sleep(10)
+#         print(f"T{id} is about to release! [currNum = {currNumInRoom}] @ {timeUnit}s\n", end="")
+#         fittingRoom.release()
+#         currNumInRoom-=1
+#         print(f"T{id} is released. [currNum = {currNumInRoom}] @ {timeUnit}s\n", end="")
+
+#     # if the counter is greater than the half of the current color processing 
+
+#     if currNumInRoom == 0:
+#         timeUnit += 1
+#         print(f">> Empty Fitting Room @ {timeUnit}s\n", end="")
+#         if counter == currentColorTotal // 2:
+#             checkIfSwitchColor()
+
 def executeThread(color, id):
-    global fittingRoom, currentColor, currNumInRoom, timeUnit
+    global fittingRoom, currentColor, currNumInRoom, timeUnit, currentColorTotal
     global counter
-
     
-    # If no color is assigned yet
+    # For the very first thread
     if currentColor == None and currNumInRoom == 0:
-        print(f"T{id} is trying to access! @ [currNum = {currNumInRoom}] @ {timeUnit}s\n", end="")
-        fittingRoom.acquire()
-        counter += 1 
-        currNumInRoom += 1
-        currentColor = color # assign Color
-        currentTotal = findCurrentColorTotal(currentColor) # set current total
-        print(f"----Current {currentColor} total initialized: {currentTotal}----\n", end="")
-        print(f"---- {currentColor} Only ----\n", end="")
-        print(f"\nT{id} was granted access!\n", end="")
-        # printSection(id, color)
-        # print(f"Thread ID = {id}, color = {color}\n", end="")
-        time.sleep(10) # this is how long it executes/stays in the section
-        print(f"T{id} is about to release! [currNum = {currNumInRoom}] @ {timeUnit}s\n", end="")
-        fittingRoom.release()
-        currNumInRoom -= 1
-        print(f"T{id} is released. [currNum = {currNumInRoom}] @ {timeUnit}s\n", end="")
-    
-    # If color inside the fitting room is the same color
-    elif currentColor == color and counter < currentTotal // 2 :
-        timeUnit += 1
-        print(f"T{id} is trying to access! @ [currNum = {currNumInRoom}] @ {timeUnit}s\n", end="")
-        fittingRoom.acquire()
         counter += 1
-        currNumInRoom += 1
-        print(f"\nT{id} was granted access! @ [currNum = {currNumInRoom}] @ {timeUnit}s\n", end="")
-        # printSection(id, color)
-        # print(f"Thread ID = {id}, color = {color}\n", end="")
-        time.sleep(10)
-        print(f"T{id} is about to release! [currNum = {currNumInRoom}] @ {timeUnit}s\n", end="")
+        print(f"T{id} is trying to access from first if statement! @ [currNum = {currNumInRoom}] @ {timeUnit}s\n", end="")
+        fittingRoom.acquire()
+        # increase counter of thread that acquired resource
+        currentColor = color # assign Color
+        currentColorTotal = findCurrentColorTotal(currentColor) # get current total of current color
+        print(f"---- {currentColor} Only ----\n", end="")
+        execute(id)
         fittingRoom.release()
-        currNumInRoom-=1
         print(f"T{id} is released. [currNum = {currNumInRoom}] @ {timeUnit}s\n", end="")
-    
-    if currNumInRoom == 0:
-        timeUnit += 1
-        print(f">> Empty Fitting Room @ {timeUnit}s\n", end="")
-        if counter == currentColorTotal // 2:
-            checkIfSwitchColor()
-    
-    
+        currNumInRoom -= 1
+        notFinished = False # So thread can exit the loop
 
-
-def printQueue(queue):
-    for t in queue:
-        t.printSelf()
-    print()
+    # Where other threads go
+    notFinished = True
+    while(notFinished):        
+        # The first thread to enter room after color switch
+        if (counter == 0 and currNumInRoom == 0) and color == currentColor:
+            print(f"T{id} is trying to access from first if statement! @ [currNum = {currNumInRoom}] @ {timeUnit}s\n", end="")
+            fittingRoom.acquire()
+            counter += 1 # increase counter of thread that acquired resource
+            print(f"\nIn while if\n", end="")
+            #currentColor = color # assign Color
+            currentColorTotal = findCurrentColorTotal(currentColor) # get current total of current color
+            print(f"---- {currentColor} Only ----\n", end="")
+            execute(id)
+            fittingRoom.release()
+            print(f"T{id} is released. [currNum = {currNumInRoom}] @ {timeUnit}s\n", end="")
+            currNumInRoom -= 1
+            notFinished = False # So thread can exit the loop
+            # if counter reaches the half of the total process and no more process are in the room OR there are no more processes left, switch color
+            if ((counter >= currentColorTotal // 2) and currNumInRoom == 0) or (currentColorTotal // 2 == 0):
+                switchColor()
+        
+        # The rest of threads - check current color if matched and if the counter of number executed threads hasn't reached the half
+        elif currentColor == color and counter < currentColorTotal // 2:
+            print(f"T{id} is trying to access! @ [currNum = {currNumInRoom}] @ {timeUnit}s\n", end="")
+            fittingRoom.acquire()
+            counter += 1 # increase counter of thread that acquired resource
+            print(f"\nIn while elif\n", end="")
+            # print(f"Thread ID = {id}, color = {color}\n", end="")
+            execute(id)
+            fittingRoom.release()
+            currNumInRoom-=1
+            print(f"T{id} is released. [currNum = {currNumInRoom}] @ {timeUnit}s\n", end="")
+            notFinished = False
+            # if counter reaches the half of the total process and no more process are in the room OR there are no more processes left, switch color
+            if ((counter >= currentColorTotal // 2) and currNumInRoom == 0) or (currentColorTotal // 2 == 0):
+                switchColor()
+        
 
 
 def main():
-    global fittingRoom, currNumInRoom, totalBlue, totalGreen
+    global fittingRoom, currNumInRoom, totalBlue, totalGreen, numAllowed
     #Ask user input
     # inputs = askInput()
     inputs = (3, 10, 10)
@@ -144,6 +207,7 @@ def main():
     numGreen = int(inputs[2])
     threads = []
     fittingRoom = Semaphore(numSlots)
+    numAllowed = Semaphore(numSlots)
     currNumInRoom = 0
     totalBlue = numBlue
     totalGreen = numGreen
