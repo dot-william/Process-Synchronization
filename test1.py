@@ -112,7 +112,7 @@ def main():
     for t in queue:
         t.setID(id)
         id += 1
-
+    # starts all the threads running
     for t in queue:
         t.start()
 
