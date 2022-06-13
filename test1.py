@@ -3,13 +3,6 @@ from threading import Thread, Semaphore
 import time
 import random
 
-'''
-fittingRoom semaphore is a sign that there is still a vacant slot in the fitting room.
-Nonzero if there is still a vacant slot, zero if there is no more vacant slot.
-
-mutex ensures that only one thread can enter or leave the fitting room at a time.
-'''
-
 # global semaphores
 fittingRoom = Semaphore()
 mutex = Semaphore()
@@ -33,24 +26,30 @@ def createThreads(queue, numThreads, color):
         t = ColoredThread(color=color)
         queue.append(t)
 
+# print all ColoredThreads in a list queue
 def printQueue(queue):
     for t in queue:
         t.printSelf()
     print()
 
+# ColoredThread object inherited from Thread to have color and id attributes
 class ColoredThread(Thread):
-
+    # method that will run when ColoredThread is started
     def run(self):
         global fittingRoom, mutex, gcolor, numSlots, runningThreads, finishedThreads, firstPrinted
+
+        # acquire fitting room only if the global color matches self color
         fittingRoom.acquire()
         while (self.color != gcolor):
             fittingRoom.release()
             fittingRoom.acquire()
 
+        # print message if a thread is the first to enter the fitting room
         if (runningThreads == 0 and not firstPrinted):
             firstPrinted = True
             print(f"{self.color} only")
         runningThreads += 1
+        # run the critical section
         mutex.acquire()
         print("Running")
         time.sleep(0.1)
@@ -73,7 +72,8 @@ class ColoredThread(Thread):
 def main():
     global fittingRoom, mutex, gcolor, numSlots, runningThreads, finishedThreads, firstPrinted
     #Ask user input
-    # inputs = askInput()
+    inputs = askInput()
+    # test cases
     # inputs = (2, 3, 4)
     # inputs = (2, 4, 3)
     # inputs = (3, 7, 7) # odd blues and odd greens
@@ -81,7 +81,8 @@ def main():
     # inputs = (5, 7, 6) # odd blues, even greens
     # inputs = (3, 12, 9) # even blues, odd greens
     # inputs = (20, 5, 16) # total no. threads less than total slots
-    inputs = (10, 50, 50) # total no. threads less than total slots
+    # inputs = (10, 50, 50) # total no. threads less than total slots
+    # inputs = (2, 4, 10)
     numSlots = int(inputs[0])
     numBlue = int(inputs[1])
     numGreen = int(inputs[2])
@@ -97,18 +98,14 @@ def main():
     createThreads(queue, numBlue, 'Blue')
     createThreads(queue, numGreen, 'Green')
 
-    # printQueue(queue)
-
-    # Shuffle the elements
+    # Shuffle the ColoredThreads in the queue
     random.shuffle(queue)
 
-    # assign thread IDs
+    # assign ColoredThread IDs
     id=1
     for t in queue:
         t.setID(id)
         id += 1
-
-    # printQueue(queue)
 
     for t in queue:
         t.start()
@@ -117,12 +114,15 @@ def main():
 
     while (total > 0):
         mutex.acquire()
+        # if all the threads in the fitting room have finished executing
         if (runningThreads > 0 and runningThreads == finishedThreads):
+            # decrement the total thread count
             if gcolor == 'Blue':
                 numBlue -= runningThreads
             else:
                 numGreen -= runningThreads
             total = numGreen + numBlue
+            # reset finished threads count
             finishedThreads = 0
             # releases all occupied rooms in the fitting room
             print('Fitting room empty\n')
