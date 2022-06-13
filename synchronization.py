@@ -117,6 +117,9 @@ def main():
     for t in queue:
         t.start()
 
+    if (numGreen <= 0):
+        gcolor = 'Blue'
+
     total = numGreen + numBlue
 
     while (total > 0):
