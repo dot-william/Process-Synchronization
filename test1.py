@@ -18,6 +18,7 @@ gcolor = 'Green'
 numSlots = 0
 runningThreads = 0
 finishedThreads = 0
+firstPrinted = False
 
 # get input from user
 def askInput():
@@ -40,13 +41,14 @@ def printQueue(queue):
 class ColoredThread(Thread):
 
     def run(self):
-        global fittingRoom, mutex, gcolor, numSlots, runningThreads, finishedThreads
+        global fittingRoom, mutex, gcolor, numSlots, runningThreads, finishedThreads, firstPrinted
         fittingRoom.acquire()
         while (self.color != gcolor):
             fittingRoom.release()
             fittingRoom.acquire()
 
-        if (runningThreads == 0):
+        if (runningThreads == 0 and not firstPrinted):
+            firstPrinted = True
             print(f"{self.color} only")
         runningThreads += 1
         mutex.acquire()
@@ -70,16 +72,22 @@ class ColoredThread(Thread):
         print(f"color = {self.color}, ID = {self.id}")
 
 def main():
-    global fittingRoom, mutex, gcolor, numSlots, runningThreads, finishedThreads
+    global fittingRoom, mutex, gcolor, numSlots, runningThreads, finishedThreads, firstPrinted
     #Ask user input
     # inputs = askInput()
-    # inputs = (2, 3, 4)
-    # inputs = (2, 4, 4)
-    inputs = (4, 5, 10)
+    inputs = (2, 3, 4)
+    # inputs = (2, 4, 3)
+    # inputs = (3, 7, 7) # odd blues and odd greens
+    # inputs = (4, 8, 10) # even blues and even greens
+    # inputs = (5, 7, 6) # odd blues, even greens
+    # inputs = (3, 12, 9) # even blues, odd greens
+    # inputs = (20, 5, 16) # total no. threads less than total slots
+    # inputs = (10, 50, 50) # total no. threads less than total slots
     numSlots = int(inputs[0])
     numBlue = int(inputs[1])
     numGreen = int(inputs[2])
     runningThreads = 0
+    print(f"slots = {numSlots}, blue = {numBlue}, green = {numGreen}\n")
 
     # initialize semaphores
     fittingRoom = Semaphore(numSlots)
@@ -90,7 +98,7 @@ def main():
     createThreads(queue, numBlue, 'Blue')
     createThreads(queue, numGreen, 'Green')
 
-    printQueue(queue)
+    # printQueue(queue)
 
     # Shuffle the elements
     random.shuffle(queue)
@@ -101,7 +109,7 @@ def main():
         t.setID(id)
         id += 1
 
-    printQueue(queue)
+    # printQueue(queue)
 
     for t in queue:
         t.start()
@@ -113,14 +121,18 @@ def main():
             total -= runningThreads
             finishedThreads = 0
             mutex.acquire()
+            # releases all occupied rooms in the fitting room
             while (runningThreads > 0):
                 fittingRoom.release()
                 runningThreads -= 1
+            firstPrinted = False
+            # changes the color that the fitting room accepts
             if gcolor == 'Blue':
-                gcolor = 'Green';
+                gcolor = 'Green'
             else:
-                gcolor = 'Blue';
-            print('Fitting room empty')
+                gcolor = 'Blue'
+            print('Fitting room empty\n')
+
             mutex.release()
 
 if __name__ == "__main__":
