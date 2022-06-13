@@ -80,16 +80,6 @@ def main():
     global fittingRoom, mutex, gcolor, numSlots, runningThreads, finishedThreads, firstPrinted
     #Ask user input
     inputs = askInput()
-    # test cases
-    # inputs = (2, 3, 4)
-    # inputs = (2, 4, 3)
-    # inputs = (3, 7, 7) # odd blues and odd greens
-    # inputs = (4, 8, 10) # even blues and even greens
-    # inputs = (5, 7, 6) # odd blues, even greens
-    # inputs = (3, 12, 9) # even blues, odd greens
-    # inputs = (20, 5, 16) # total no. threads less than total slots
-    # inputs = (10, 50, 50) # total no. threads less than total slots
-    # inputs = (2, 4, 10)
     numSlots = int(inputs[0])
     numBlue = int(inputs[1])
     numGreen = int(inputs[2])
