@@ -145,9 +145,9 @@ def executeThread(color, id):
     
     # For the very first thread
     if currentColor == None and currNumInRoom == 0:
-        counter += 1
         print(f"T{id} is trying to access from first if statement! @ [currNum = {currNumInRoom}] @ {timeUnit}s\n", end="")
         fittingRoom.acquire()
+        counter += 1
         # increase counter of thread that acquired resource
         currentColor = color # assign Color
         currentColorTotal = findCurrentColorTotal(currentColor) # get current total of current color
