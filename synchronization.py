@@ -59,7 +59,6 @@ class ColoredThread(Thread):
         runningThreads += 1
         # run the critical section
         mutex.acquire()
-        print("Running")
         time.sleep(0.1)
         # print thread
         self.printSelf()
@@ -75,7 +74,7 @@ class ColoredThread(Thread):
         self.id = id
 
     def printSelf(self):
-        print(f"color = {self.color}, ID = {self.id}")
+        print(f"Color = {self.color}, ID = {self.id}")
 
 def main():
     global fittingRoom, mutex, gcolor, numSlots, runningThreads, finishedThreads, firstPrinted
