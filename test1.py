@@ -15,9 +15,15 @@ firstPrinted = False
 
 # get input from user
 def askInput():
-    numSlots = input("Enter the number of slots inside the fitting room: ")
-    numBlueThreads = input("Enter the number of blue threads: ")
-    numGreenThreads = input("Enter the number of green threads: ")
+    invalidInput = True
+    while(invalidInput):
+        numSlots = input("Enter the number of slots inside the fitting room: ")
+        numBlueThreads = input("Enter the number of blue threads: ")
+        numGreenThreads = input("Enter the number of green threads: ")
+        if int(numSlots) <= 0 or int(numBlueThreads) < 0 or int(numGreenThreads) < 0:
+            print("Invalid inputs, try again.")
+        else:
+            invalidInput = False
     return numSlots, numBlueThreads, numGreenThreads
 
 # create threads of the specified count and color and
@@ -99,7 +105,7 @@ def main():
     createThreads(queue, numGreen, 'Green')
 
     # Shuffle the ColoredThreads in the queue
-    random.shuffle(queue)
+    #random.shuffle(queue)
 
     # assign ColoredThread IDs
     id=1
