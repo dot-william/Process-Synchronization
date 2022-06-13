@@ -76,12 +76,12 @@ def main():
     # inputs = askInput()
     # inputs = (2, 3, 4)
     # inputs = (2, 4, 3)
-    inputs = (3, 7, 7) # odd blues and odd greens
+    # inputs = (3, 7, 7) # odd blues and odd greens
     # inputs = (4, 8, 10) # even blues and even greens
     # inputs = (5, 7, 6) # odd blues, even greens
     # inputs = (3, 12, 9) # even blues, odd greens
     # inputs = (20, 5, 16) # total no. threads less than total slots
-    # inputs = (10, 50, 50) # total no. threads less than total slots
+    inputs = (10, 50, 50) # total no. threads less than total slots
     numSlots = int(inputs[0])
     numBlue = int(inputs[1])
     numGreen = int(inputs[2])
@@ -118,7 +118,11 @@ def main():
     while (total > 0):
         mutex.acquire()
         if (runningThreads > 0 and runningThreads == finishedThreads):
-            total -= runningThreads
+            if gcolor == 'Blue':
+                numBlue -= runningThreads
+            else:
+                numGreen -= runningThreads
+            total = numGreen + numBlue
             finishedThreads = 0
             # releases all occupied rooms in the fitting room
             print('Fitting room empty\n')
@@ -127,9 +131,9 @@ def main():
                 runningThreads -= 1
             firstPrinted = False
             # changes the color that the fitting room accepts
-            if gcolor == 'Blue':
+            if gcolor == 'Blue' and numGreen > 0:
                 gcolor = 'Green'
-            else:
+            elif numBlue > 0:
                 gcolor = 'Blue'
         mutex.release()
 
