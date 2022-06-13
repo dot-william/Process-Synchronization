@@ -180,7 +180,8 @@ def executeThread(color, id):
                 switchColor()
         
         # The rest of threads - check current color if matched and if the counter of number executed threads hasn't reached the half
-        elif currentColor == color and counter < currentColorTotal // 2:
+        
+        elif (currentColor == color) and (counter < currentColorTotal // 2):
             print(f"T{id} is trying to access! @ [currNum = {currNumInRoom}] and counter: {counter}\n", end="")
             fittingRoom.acquire()
             counter += 1 # increase counter of thread that acquired resource
