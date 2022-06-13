@@ -1,5 +1,5 @@
-# Dimaculangan, William and Que, Simon
-# CSOPESY S14 and S15
+# Authors: Simon Que (S15) and William Dimaculangan (S14)
+
 import threading
 from threading import Thread, Semaphore
 import time
